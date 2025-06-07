@@ -2,7 +2,6 @@ import streamlit as st
 import google.generativeai as genai
 from PyPDF2 import PdfReader
 import speech_recognition as sr
-
 # Set your Gemini API key here
 GEMINI_API_KEY = "AIzaSyCbiUUxGB-4cpjUZ-P7O6bJwijdftvYEec"
 
