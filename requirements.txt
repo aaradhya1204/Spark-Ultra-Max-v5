@@ -1,4 +1,5 @@
 streamlit
-google-generativeai
 PyPDF2
-SpeechRecognition
+speechrecognition
+pyttsx3
+google-generative-ai
