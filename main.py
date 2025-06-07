@@ -1,8 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
 from PyPDF2 import PdfReader
-import speech_recognition as sr
-import pyttsx3
 
 # Set your Gemini API key here
 GEMINI_API_KEY = "AIzaSyCbiUUxGB-4cpjUZ-P7O6bJwijdftvYEec"
@@ -52,37 +50,14 @@ def plagiarism_checker():
         summary = call_gemini_api(prompt)
         st.write("Summary:", summary)
 
-# --- Voice & Speech AI ---
+# --- Voice & Speech AI (placeholders) ---
 def speech_to_text():
-    st.header("🎤 Real Speech-to-Text Transcription")
-    st.write("Click the button and speak. Your speech will be converted to text.")
-    if st.button("Start Recording"):
-        recognizer = sr.Recognizer()
-        mic = sr.Microphone()
-        with mic as source:
-            st.info("Listening... Please speak now.")
-            recognizer.adjust_for_ambient_noise(source)
-            audio = recognizer.listen(source, phrase_time_limit=10)
-        try:
-            text = recognizer.recognize_google(audio)
-            st.success("Transcription:")
-            st.write(text)
-        except sr.UnknownValueError:
-            st.error("Sorry, could not understand the audio.")
-        except sr.RequestError as e:
-            st.error(f"Could not request results from Google Speech Recognition service; {e}")
+    st.header("Speech-to-Text Transcription")
+    st.info("Upload audio file feature coming soon!")
 
 def text_to_speech():
-    st.header("🔊 Text-to-Speech Reader")
-    text = st.text_area("Enter text to read aloud:")
-    if st.button("Speak"):
-        if text.strip():
-            engine = pyttsx3.init()
-            engine.say(text)
-            engine.runAndWait()
-            st.success("Spoken successfully!")
-        else:
-            st.warning("Please enter some text to speak.")
+    st.header("Text-to-Speech Reader")
+    st.info("Upload Text-to-Speech Reader feature coming soon!")
 
 # --- Recommendation Systems ---
 def recommend_movies():
@@ -134,7 +109,7 @@ def quiz_generator():
     st.header("Quiz Generator")
     uploaded_file = st.file_uploader("Upload your study material (TXT or PDF)", type=["txt", "pdf"])
     num_questions = st.slider("Number of questions", 1, 10, 5)
-
+    
     def extract_text_from_pdf(file):
         try:
             pdf = PdfReader(file)
@@ -144,16 +119,16 @@ def quiz_generator():
             return text
         except Exception as e:
             return f"Error reading PDF: {str(e)}"
-
+    
     if uploaded_file:
         if uploaded_file.type == "application/pdf":
             text = extract_text_from_pdf(uploaded_file)
         else:
             text = uploaded_file.read().decode("utf-8")
-
+        
         with st.expander("Extracted Text Preview"):
             st.write(text[:1000] + "..." if len(text) > 1000 else text)
-
+        
         if st.button("Generate Quiz"):
             prompt = f"Generate {num_questions} multiple choice questions with 4 options each based on this text:\n\n{text}"
             quiz = call_gemini_api(prompt)
@@ -176,11 +151,8 @@ with col2:
     st.markdown("## Spark 5.0 Ultra MAX Mode AI")
     st.caption("By Aaradhya Pratish Vanakhade")
 
-# --- Optional: Theme detection ---
-current_theme = st.get_option("theme.base")
-st.sidebar.markdown(f"**Theme:** `{current_theme}`")
-
 st.sidebar.title("Select AI Tool Category")
+
 option = st.sidebar.selectbox("Choose category", [
     "Text Analysis",
     "Voice & Speech AI",
