@@ -31,7 +31,7 @@ def call_gemini_api(prompt, temperature=0.7):
 def sentiment_analysis():
     st.header("Sentiment Analysis")
     text = st.text_area("Paste text to analyze sentiment:", key="sentiment_text")
-    if st.button("Analyze Sentiment", key="analyze_sentiment_btn"):
+    if st.button("Analyze Sentiment", key="sentiment_button"):
         prompt = f"Analyze the sentiment of this text and respond with Positive, Neutral, or Negative:\n\n{text}"
         result = call_gemini_api(prompt)
         st.write("Sentiment:", result)
@@ -39,7 +39,7 @@ def sentiment_analysis():
 def spam_detector():
     st.header("Spam / Fake News Detector")
     text = st.text_area("Paste text to detect spam/fake news:", key="spam_text")
-    if st.button("Check Spam/Fake News", key="check_spam_btn"):
+    if st.button("Check Spam/Fake News", key="spam_button"):
         prompt = f"Detect if this text is spam or fake news. Respond with Yes or No and explain briefly:\n\n{text}"
         result = call_gemini_api(prompt)
         st.write(result)
@@ -47,7 +47,7 @@ def spam_detector():
 def plagiarism_checker():
     st.header("Plagiarism Checker / Text Summarizer")
     text = st.text_area("Paste text to summarize or check plagiarism:", key="plagiarism_text")
-    if st.button("Summarize Text", key="summarize_text_btn"):
+    if st.button("Summarize Text", key="plagiarism_button"):
         prompt = f"Summarize the following text briefly:\n\n{text}"
         summary = call_gemini_api(prompt)
         st.write("Summary:", summary)
@@ -57,7 +57,7 @@ def speech_to_text():
     st.header("🎤 Real Speech-to-Text Transcription")
     st.write("Click the button and speak. Your speech will be converted to text.")
 
-    if st.button("Start Recording", key="start_recording_btn"):
+    if st.button("Start Recording", key="speech_record_button"):
         recognizer = sr.Recognizer()
         mic = sr.Microphone()
         with mic as source:
@@ -77,7 +77,7 @@ def speech_to_text():
 def text_to_speech():
     st.header("🔊 Text-to-Speech Reader")
     text = st.text_area("Enter text to read aloud:", key="tts_text")
-    if st.button("Speak", key="speak_btn"):
+    if st.button("Speak", key="tts_button"):
         if text.strip():
             engine = pyttsx3.init()
             engine.say(text)
@@ -90,7 +90,7 @@ def text_to_speech():
 def recommend_movies():
     st.header("Movie Recommender")
     genre = st.text_input("Enter preferred genre:", key="movie_genre")
-    if st.button("Get Recommendations", key="get_recommendations_btn"):
+    if st.button("Get Recommendations", key="movie_rec_button"):
         prompt = f"Recommend 5 {genre} movies with short descriptions."
         recs = call_gemini_api(prompt)
         st.write(recs)
@@ -98,16 +98,16 @@ def recommend_movies():
 # --- Language Learning Tools ---
 def language_tutor():
     st.header("AI Language Tutor with Grammar Correction")
-    text = st.text_area("Write a sentence or paragraph to correct:", key="language_tutor_text")
-    if st.button("Correct Grammar", key="correct_grammar_btn"):
+    text = st.text_area("Write a sentence or paragraph to correct:", key="tutor_text")
+    if st.button("Correct Grammar", key="tutor_button"):
         prompt = f"Correct the grammar and improve this text:\n\n{text}"
         corrected = call_gemini_api(prompt)
         st.write("Corrected Text:", corrected)
 
 def translator():
     st.header("Real-time Translator")
-    text = st.text_area("Enter text to translate to French:", key="translate_text")
-    if st.button("Translate", key="translate_btn"):
+    text = st.text_area("Enter text to translate to French:", key="translator_text")
+    if st.button("Translate", key="translator_button"):
         prompt = f"Translate this text to French:\n\n{text}"
         translation = call_gemini_api(prompt)
         st.write("Translation:", translation)
@@ -116,7 +116,7 @@ def translator():
 def email_generator():
     st.header("Email / Social Media Content Generator")
     topic = st.text_input("Enter topic or subject:", key="email_topic")
-    if st.button("Generate Content", key="generate_email_btn"):
+    if st.button("Generate Content", key="email_generate_button"):
         prompt = f"Write an engaging email about {topic}."
         email_text = call_gemini_api(prompt)
         st.write(email_text)
@@ -124,8 +124,8 @@ def email_generator():
 # --- Healthcare AI ---
 def symptom_checker():
     st.header("Symptom Checker Chatbot")
-    symptoms = st.text_area("Enter your symptoms:", key="symptoms_text")
-    if st.button("Check Symptoms", key="check_symptoms_btn"):
+    symptoms = st.text_area("Enter your symptoms:", key="symptom_text")
+    if st.button("Check Symptoms", key="symptom_button"):
         prompt = f"Based on these symptoms, what could be the possible causes? {symptoms}. Note: This is for informational purposes only and not medical advice."
         advice = call_gemini_api(prompt)
         st.write(advice)
@@ -135,7 +135,7 @@ def symptom_checker():
 def quiz_generator():
     st.header("Quiz Generator")
     uploaded_file = st.file_uploader("Upload your study material (TXT or PDF)", type=["txt", "pdf"], key="quiz_file_uploader")
-    num_questions = st.slider("Number of questions", 1, 10, 5, key="num_questions_slider")
+    num_questions = st.slider("Number of questions", 1, 10, 5, key="quiz_num_questions")
     
     def extract_text_from_pdf(file):
         try:
@@ -156,16 +156,16 @@ def quiz_generator():
         with st.expander("Extracted Text Preview"):
             st.write(text[:1000] + "..." if len(text) > 1000 else text)
         
-        if st.button("Generate Quiz", key="generate_quiz_btn"):
+        if st.button("Generate Quiz", key="generate_quiz_button"):
             prompt = f"Generate {num_questions} multiple choice questions with 4 options each based on this text:\n\n{text}"
             quiz = call_gemini_api(prompt)
-            st.text_area("Generated Quiz Questions:", quiz, height=300, key="quiz_output_text_area")
+            st.text_area("Generated Quiz Questions:", quiz, height=300, key="quiz_text_area")
 
 # --- Creative Tools ---
 def story_generator():
     st.header("AI Story / Poetry Generator")
     topic = st.text_input("Enter story or poem topic:", key="story_topic")
-    if st.button("Generate Story/Poem", key="generate_story_btn"):
+    if st.button("Generate Story/Poem", key="story_generate_button"):
         prompt = f"Write a creative story or poem about {topic}."
         story = call_gemini_api(prompt)
         st.write(story)
@@ -191,7 +191,7 @@ option = st.sidebar.selectbox("Choose category", [
     "Healthcare AI",
     "Educational Tools",
     "Creative Tools"
-])
+], key="sidebar_option")
 
 if option == "Text Analysis":
     tabs = st.tabs(["Sentiment Analysis", "Spam Detector", "Plagiarism Checker"])
