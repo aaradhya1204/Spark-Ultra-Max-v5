@@ -1,4 +1,5 @@
-streamlit
-PyPDF2
-speechrecognition
-google-generative-ai
+protobuf==6.31.1
+PyPDF2==3.0.1
+pyttsx3==2.90
+SpeechRecognition==3.10.3
+streamlit==1.36.0
