@@ -1,6 +1,8 @@
 import streamlit as st
 import google.generativeai as genai
 from PyPDF2 import PdfReader
+import speech_recognition as sr
+import pyttsx3
 
 # Set your Gemini API key here
 GEMINI_API_KEY = "AIzaSyCbiUUxGB-4cpjUZ-P7O6bJwijdftvYEec"
@@ -50,14 +52,39 @@ def plagiarism_checker():
         summary = call_gemini_api(prompt)
         st.write("Summary:", summary)
 
-# --- Voice & Speech AI (placeholders) ---
+# --- Voice & Speech AI ---
 def speech_to_text():
-    st.header("Speech-to-Text Transcription")
-    st.info("Upload audio file feature coming soon!")
+    st.header("🎤 Real Speech-to-Text Transcription")
+    st.write("Click the button and speak. Your speech will be converted to text.")
+
+    if st.button("Start Recording"):
+        recognizer = sr.Recognizer()
+        mic = sr.Microphone()
+        with mic as source:
+            st.info("Listening... Please speak now.")
+            recognizer.adjust_for_ambient_noise(source)
+            audio = recognizer.listen(source, phrase_time_limit=10)
+
+        try:
+            text = recognizer.recognize_google(audio)
+            st.success("Transcription:")
+            st.write(text)
+        except sr.UnknownValueError:
+            st.error("Sorry, could not understand the audio.")
+        except sr.RequestError as e:
+            st.error(f"Could not request results from Google Speech Recognition service; {e}")
 
 def text_to_speech():
-    st.header("Text-to-Speech Reader")
-    st.info("Upload Text-to-Speech Reader feature coming soon!")
+    st.header("🔊 Text-to-Speech Reader")
+    text = st.text_area("Enter text to read aloud:")
+    if st.button("Speak"):
+        if text.strip():
+            engine = pyttsx3.init()
+            engine.say(text)
+            engine.runAndWait()
+            st.success("Spoken successfully!")
+        else:
+            st.warning("Please enter some text to speak.")
 
 # --- Recommendation Systems ---
 def recommend_movies():
@@ -144,7 +171,14 @@ def story_generator():
         st.write(story)
 
 # --- Main app layout ---
-st.title("✨ Spark 5.0 Ultra MAX Mode AI By Aaradhya Pratish Vanakhade")
+col1, col2 = st.columns([1, 4])
+
+with col1:
+    st.image("ChatGPT Image Jun 6, 2025, 10_32_22 AM.png", width=125)
+
+with col2:
+    st.markdown("## Spark 5.0 Ultra MAX Mode AI")
+    st.caption("By Aaradhya Pratish Vanakhade")
 
 st.sidebar.title("Select AI Tool Category")
 
