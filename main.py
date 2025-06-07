@@ -2,6 +2,8 @@ import streamlit as st
 import google.generativeai as genai
 from PyPDF2 import PdfReader
 import speech_recognition as sr
+import pyttsx3
+
 # Set your Gemini API key here
 GEMINI_API_KEY = "AIzaSyCbiUUxGB-4cpjUZ-P7O6bJwijdftvYEec"
 
@@ -28,24 +30,24 @@ def call_gemini_api(prompt, temperature=0.7):
 # --- Text Analysis Tools ---
 def sentiment_analysis():
     st.header("Sentiment Analysis")
-    text = st.text_area("Paste text to analyze sentiment:", key="sentiment_text")
-    if st.button("Analyze Sentiment", key="analyze_sentiment"):
+    text = st.text_area("Paste text to analyze sentiment:")
+    if st.button("Analyze Sentiment"):
         prompt = f"Analyze the sentiment of this text and respond with Positive, Neutral, or Negative:\n\n{text}"
         result = call_gemini_api(prompt)
         st.write("Sentiment:", result)
 
 def spam_detector():
     st.header("Spam / Fake News Detector")
-    text = st.text_area("Paste text to detect spam/fake news:", key="spam_text")
-    if st.button("Check Spam/Fake News", key="check_spam"):
+    text = st.text_area("Paste text to detect spam/fake news:")
+    if st.button("Check Spam/Fake News"):
         prompt = f"Detect if this text is spam or fake news. Respond with Yes or No and explain briefly:\n\n{text}"
         result = call_gemini_api(prompt)
         st.write(result)
 
 def plagiarism_checker():
     st.header("Plagiarism Checker / Text Summarizer")
-    text = st.text_area("Paste text to summarize or check plagiarism:", key="plagiarism_text")
-    if st.button("Summarize Text", key="summarize_text"):
+    text = st.text_area("Paste text to summarize or check plagiarism:")
+    if st.button("Summarize Text"):
         prompt = f"Summarize the following text briefly:\n\n{text}"
         summary = call_gemini_api(prompt)
         st.write("Summary:", summary)
@@ -54,15 +56,13 @@ def plagiarism_checker():
 def speech_to_text():
     st.header("🎤 Real Speech-to-Text Transcription")
     st.write("Click the button and speak. Your speech will be converted to text.")
-
-    if st.button("Start Recording", key="start_recording"):
+    if st.button("Start Recording"):
         recognizer = sr.Recognizer()
         mic = sr.Microphone()
         with mic as source:
             st.info("Listening... Please speak now.")
             recognizer.adjust_for_ambient_noise(source)
             audio = recognizer.listen(source, phrase_time_limit=10)
-
         try:
             text = recognizer.recognize_google(audio)
             st.success("Transcription:")
@@ -72,11 +72,23 @@ def speech_to_text():
         except sr.RequestError as e:
             st.error(f"Could not request results from Google Speech Recognition service; {e}")
 
+def text_to_speech():
+    st.header("🔊 Text-to-Speech Reader")
+    text = st.text_area("Enter text to read aloud:")
+    if st.button("Speak"):
+        if text.strip():
+            engine = pyttsx3.init()
+            engine.say(text)
+            engine.runAndWait()
+            st.success("Spoken successfully!")
+        else:
+            st.warning("Please enter some text to speak.")
+
 # --- Recommendation Systems ---
 def recommend_movies():
     st.header("Movie Recommender")
-    genre = st.text_input("Enter preferred genre:", key="movie_genre")
-    if st.button("Get Recommendations", key="get_recommendations"):
+    genre = st.text_input("Enter preferred genre:")
+    if st.button("Get Recommendations"):
         prompt = f"Recommend 5 {genre} movies with short descriptions."
         recs = call_gemini_api(prompt)
         st.write(recs)
@@ -84,16 +96,16 @@ def recommend_movies():
 # --- Language Learning Tools ---
 def language_tutor():
     st.header("AI Language Tutor with Grammar Correction")
-    text = st.text_area("Write a sentence or paragraph to correct:", key="language_text")
-    if st.button("Correct Grammar", key="correct_grammar"):
+    text = st.text_area("Write a sentence or paragraph to correct:")
+    if st.button("Correct Grammar"):
         prompt = f"Correct the grammar and improve this text:\n\n{text}"
         corrected = call_gemini_api(prompt)
         st.write("Corrected Text:", corrected)
 
 def translator():
     st.header("Real-time Translator")
-    text = st.text_area("Enter text to translate to French:", key="translate_text")
-    if st.button("Translate", key="translate_button"):
+    text = st.text_area("Enter text to translate to French:")
+    if st.button("Translate"):
         prompt = f"Translate this text to French:\n\n{text}"
         translation = call_gemini_api(prompt)
         st.write("Translation:", translation)
@@ -101,8 +113,8 @@ def translator():
 # --- Automation Tools ---
 def email_generator():
     st.header("Email / Social Media Content Generator")
-    topic = st.text_input("Enter topic or subject:", key="email_topic")
-    if st.button("Generate Content", key="generate_email"):
+    topic = st.text_input("Enter topic or subject:")
+    if st.button("Generate Content"):
         prompt = f"Write an engaging email about {topic}."
         email_text = call_gemini_api(prompt)
         st.write(email_text)
@@ -110,8 +122,8 @@ def email_generator():
 # --- Healthcare AI ---
 def symptom_checker():
     st.header("Symptom Checker Chatbot")
-    symptoms = st.text_area("Enter your symptoms:", key="symptom_text")
-    if st.button("Check Symptoms", key="check_symptoms"):
+    symptoms = st.text_area("Enter your symptoms:")
+    if st.button("Check Symptoms"):
         prompt = f"Based on these symptoms, what could be the possible causes? {symptoms}. Note: This is for informational purposes only and not medical advice."
         advice = call_gemini_api(prompt)
         st.write(advice)
@@ -120,9 +132,9 @@ def symptom_checker():
 # --- Educational Tools ---
 def quiz_generator():
     st.header("Quiz Generator")
-    uploaded_file = st.file_uploader("Upload your study material (TXT or PDF)", type=["txt", "pdf"], key="quiz_uploader")
-    num_questions = st.slider("Number of questions", 1, 10, 5, key="num_questions")
-    
+    uploaded_file = st.file_uploader("Upload your study material (TXT or PDF)", type=["txt", "pdf"])
+    num_questions = st.slider("Number of questions", 1, 10, 5)
+
     def extract_text_from_pdf(file):
         try:
             pdf = PdfReader(file)
@@ -132,42 +144,43 @@ def quiz_generator():
             return text
         except Exception as e:
             return f"Error reading PDF: {str(e)}"
-    
+
     if uploaded_file:
         if uploaded_file.type == "application/pdf":
             text = extract_text_from_pdf(uploaded_file)
         else:
             text = uploaded_file.read().decode("utf-8")
-        
+
         with st.expander("Extracted Text Preview"):
             st.write(text[:1000] + "..." if len(text) > 1000 else text)
-        
-        if st.button("Generate Quiz", key="generate_quiz"):
+
+        if st.button("Generate Quiz"):
             prompt = f"Generate {num_questions} multiple choice questions with 4 options each based on this text:\n\n{text}"
             quiz = call_gemini_api(prompt)
-            st.text_area("Generated Quiz Questions:", quiz, height=300, key="quiz_output")
+            st.text_area("Generated Quiz Questions:", quiz, height=300)
 
 # --- Creative Tools ---
 def story_generator():
     st.header("AI Story / Poetry Generator")
-    topic = st.text_input("Enter story or poem topic:", key="story_topic")
-    if st.button("Generate Story/Poem", key="generate_story"):
+    topic = st.text_input("Enter story or poem topic:")
+    if st.button("Generate Story/Poem"):
         prompt = f"Write a creative story or poem about {topic}."
         story = call_gemini_api(prompt)
         st.write(story)
 
 # --- Main app layout ---
 col1, col2 = st.columns([1, 4])
-
 with col1:
     st.image("ChatGPT Image Jun 6, 2025, 10_32_22 AM.png", width=125)
-
 with col2:
     st.markdown("## Spark 5.0 Ultra MAX Mode AI")
     st.caption("By Aaradhya Pratish Vanakhade")
 
-st.sidebar.title("Select AI Tool Category")
+# --- Optional: Theme detection ---
+current_theme = st.get_option("theme.base")
+st.sidebar.markdown(f"**Theme:** `{current_theme}`")
 
+st.sidebar.title("Select AI Tool Category")
 option = st.sidebar.selectbox("Choose category", [
     "Text Analysis",
     "Voice & Speech AI",
@@ -189,9 +202,11 @@ if option == "Text Analysis":
         plagiarism_checker()
 
 elif option == "Voice & Speech AI":
-    tabs = st.tabs(["Speech-to-Text"])
+    tabs = st.tabs(["Speech-to-Text", "Text-to-Speech"])
     with tabs[0]:
         speech_to_text()
+    with tabs[1]:
+        text_to_speech()
 
 elif option == "Recommendation Systems":
     recommend_movies()
